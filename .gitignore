@@ -2,4 +2,6 @@ node_modules/
 .next/
 .env*
 .env.local
-*.log
+*.logcl4.txt
+claude update4.txt
+*.txt
