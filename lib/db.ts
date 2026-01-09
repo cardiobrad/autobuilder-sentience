@@ -51,27 +51,4 @@ export const db = {
   },
   projects: {
     list: async (userId: string, query: { page: number, limit: number }) => {
-      const userProjects = mockProjects.filter(p => p.userId === userId);
-      const startIndex = (query.page - 1) * query.limit;
-      const endIndex = startIndex + query.limit;
-      return userProjects.slice(startIndex, endIndex);
-    },
-    findById: async (id: string) => mockProjects.find(p => p.id === id),
-    create: async (project: Omit<Project, 'id'> & { id?: string }) => {
-      const newProject = { id: project.id || `proj_${mockProjects.length + 1}`, ...project };
-      mockProjects.push(newProject);
-      return newProject;
-    },
-    update: async (id: string, updates: Partial<Project>) => {
-      const index = mockProjects.findIndex(p => p.id === id);
-      if (index === -1) return null;
-      mockProjects[index] = { ...mockProjects[index], ...updates };
-      return mockProjects[index];
-    },
-    delete: async (id: string) => {
-      const initialLength = mockProjects.length;
-      mockProjects = mockProjects.filter(p => p.id !== id);
-      return mockProjects.length < initialLength;
-    }
-  }
-};
+      const userProjects = mockProjects.filter(p => p.us
