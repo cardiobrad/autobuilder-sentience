@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 import { db } from '@/lib/db'; // Mock DB
 import { schemas, validateInput } from '@/lib/security/validation';
 import { createNewSession } from '@/lib/auth/session';
