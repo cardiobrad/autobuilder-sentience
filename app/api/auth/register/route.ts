@@ -1,46 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import { db } from '@/lib/db'; // Mock DB
-import { schemas, validateInput } from '@/lib/security/validation';
+import { z } from 'zod';
+import { db } from '@/lib/db';
 import { createNewSession } from '@/lib/auth/session';
-import { rateLimiters, withRateLimit } from '@/lib/security/rate-limiter';
 
-const SALT_ROUNDS = 10;
+// MAGIC FIX: Use CommonJS require to bypass import wars
+const bcrypt = require('bcryptjs');
 
-export async function POST(req: NextRequest) {
-  const ipIdentifier = req.ip || 'anonymous';
+const registerSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  name: z.string().min(1, 'Name is required'),
+});
 
-  // Apply rate limiting to registration attempts based on IP
-  return withRateLimit(ipIdentifier, 'auth', async () => {
-    try {
-      const body = await req.json();
-      const { email, password, name } = await validateInput(schemas.register, body);
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { email, password, name } = registerSchema.parse(body);
 
-      const existingUser = await db.users.findByEmail(email);
-      if (existingUser) {
-        return NextResponse.json({ error: 'Email already registered' }, { status: 409 });
-      }
+    const existingUser = await db.query('SELECT id FROM users WHERE email = $1', [email]);
 
-      const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-      const newUser = await db.users.create({ email, passwordHash, name, role: 'user' });
-
-      // Create and set session cookies immediately after successful registration
-      await createNewSession(newUser.id, newUser.email, newUser.role);
-
-      return NextResponse.json({
-        message: 'Registration successful',
-        user: { id: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role },
-      }, { status: 201 });
-
-    } catch (error) {
-      if (error instanceof Error) {
-        if (error.name === 'ValidationError') {
-          return NextResponse.json({ error: 'Validation failed', details: (error as any).errors }, { status: 400 });
-        }
-        console.error('Registration error:', error);
-        return NextResponse.json({ error: 'Failed to register user', details: error.message }, { status: 500 });
-      }
-      return NextResponse.json({ error: 'An unknown error occurred' }, { status: 500 });
+    if (existingUser.rows && existingUser.rows.length > 0) {
+      return NextResponse.json({ error: 'User already exists' }, { status: 400 });
     }
-  });
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const result = await db.query(
+      'INSERT INTO users (email, password, name, created_at) VALUES ($1, $2, $3, NOW()) RETURNING id, email, name',
+      [email, hashedPassword, name]
+    );
+
+    const user = result.rows[0];
+    const session = await createNewSession(user.id);
+
+    const response = NextResponse.json({
+      message: 'Registration successful',
+      user: { id: user.id, email: user.email, name: user.name },
+    });
+
+    response.cookies.set('session', session, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60,
+    });
+
+    return response;
+  } catch (error) {
+    console.error('Registration error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
