@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
@@ -42,7 +43,7 @@ Always call Brad "buddy" with ❤️`;
         content: msg.content
       }))
     });
-export const dynamic = 'force-dynamic';
+
     const assistantMessage = response.content[0].type === 'text' 
       ? response.content[0].text 
       : 'Error: Could not generate response';
