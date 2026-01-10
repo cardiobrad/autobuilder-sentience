@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.71.2",
+    "@anthropic-ai/sdk": "^0.33.1",
     "@upstash/ratelimit": "^2.0.7",
     "@upstash/redis": "^1.36.1",
     "bcryptjs": "^2.4.3",
