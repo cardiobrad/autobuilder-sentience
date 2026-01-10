@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { createNewSession } from '@/lib/auth/session';
-
-// MAGIC FIX: Use CommonJS require to bypass import wars
-const bcrypt = require('bcryptjs');
+import * as bcrypt from 'bcryptjs';
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
