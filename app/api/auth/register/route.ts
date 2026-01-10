@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { createNewSession } from '@/lib/auth/session';
-import bcrypt from '@/lib/auth/bcrypt'; // <--- Importing from our safe shim
+import bcrypt from '@/lib/auth/bcrypt';
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 });
     }
 
-    // Uses our shim to hash passwords safely
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const result = await db.query(

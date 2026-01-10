@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { createNewSession } from '@/lib/auth/session';
-import bcrypt from '@/lib/auth/bcrypt'; // <--- Importing from our safe shim
+import bcrypt from '@/lib/auth/bcrypt';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password } = loginSchema.parse(body);
 
-    // Database query (Lazy loaded via lib/db.ts)
     const result = await db.query('SELECT id, email, password FROM users WHERE email = $1', [email]);
 
     if (!result.rows || result.rows.length === 0) {
@@ -22,8 +21,6 @@ export async function POST(request: NextRequest) {
     }
 
     const user = result.rows[0];
-    
-    // Uses our shim to compare passwords safely
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
