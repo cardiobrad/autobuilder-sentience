@@ -41,7 +41,7 @@ export default function ChatInterface() {
       
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: data.response || 'No response received'
+       content: data.content || 'No response received'
       }]);
     } catch (error: any) {
       setMessages(prev => [...prev, {
