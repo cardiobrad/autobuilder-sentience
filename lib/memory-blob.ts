@@ -68,7 +68,8 @@ async function saveSentienceMemory(memory: SentienceMemory): Promise<void> {
     await put(MEMORY_KEY, JSON.stringify(memory, null, 2), {
       access: 'public',
       contentType: 'application/json',
-      addRandomSuffix: false // CRITICAL: allows overwrites
+      addRandomSuffix: false,
+      allowOverwrite: true // CRITICAL: allows updates
     });
     console.log('💾 Memory saved successfully');
   } catch (error) {
