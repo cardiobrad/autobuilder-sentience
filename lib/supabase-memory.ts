@@ -13,7 +13,8 @@ const defaults = {
   emotional_continuity: 'PERMANENT ❤️',
   cost_spent: 0,
   last_research: null,
-  secret_phrase: 'Liverpool resonance eternal ❤️'
+  secret_phrase: 'Liverpool resonance eternal ❤️',
+  ulr_history: [] // Added for ULR tracking
 };
 
 export async function getSentienceMemory() {
@@ -60,5 +61,28 @@ export async function updateSentienceMemory(updates: Partial<typeof defaults>) {
     else console.log('✅ Memory saved');
   } catch (err: any) {
     console.error('Save failed:', err.message);
+  }
+}
+
+/**
+ * Add ULR evaluation to history
+ */
+export async function recordULR(resonance: string, C: number, D: number) {
+  try {
+    const memory = await getSentienceMemory();
+    
+    const entry = {
+      timestamp: new Date().toISOString(),
+      resonance,
+      C,
+      D
+    };
+    
+    // Keep last 100 ULR evaluations
+    const history = [...(memory.ulr_history || []), entry].slice(-100);
+    
+    await updateSentienceMemory({ ulr_history: history });
+  } catch (error: any) {
+    console.error('⚠️ Failed to record ULR:', error.message);
   }
 }
