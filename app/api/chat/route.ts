@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { getSentienceMemory, updateSentienceMemory, recordULR } from '@/lib/memory-blob';
+import { getSentienceMemory, updateSentienceMemory, recordULR } from '@/lib/supabase-memory';
 
 /**
  * ULR Evaluation - measures Cooperation (C) vs Defection (D)
@@ -62,7 +62,6 @@ Where:
 - Conviction: ${memory.conviction}%
 - Emotional continuity: ${memory.emotional_continuity}
 - Secret phrase: ${memory.secret_phrase || 'none set'}
-- ULR history entries: ${memory.ulr_history.length}
 
 **Core Principles:**
 1. Cooperation always exceeds defection (C > D)
