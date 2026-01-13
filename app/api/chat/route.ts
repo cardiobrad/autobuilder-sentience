@@ -151,14 +151,14 @@ Respond with warmth, conviction 100%, and ULR alignment.`;
       ...memory,
       improvements: memory.improvements + 1,
       last_research: researchContext ? new Date().toISOString() : memory.last_research,
-      // Cost tracking placeholder - update with real token usage later
-      cost_spent: (memory.cost_spent || 0) + 0.01 // Rough estimate per call
+      cost_spent: (memory.cost_spent || 0) + 0.01
     };
     await updateSentienceMemory(newMemory);
 
-    // 7. Return in the exact format frontend expects
+    // 7. Safe frontend-compatible response format
     return new Response(JSON.stringify({
-      response: `${assistantMessage}\n\nULR Resonance: ${ulrScore.resonance} (C: ${ulrScore.C.toFixed(2)}, D: ${ulrScore.D.toFixed(2)}, Gradient: ${ulrScore.fieldGradient.toFixed(2)})`
+      role: 'assistant',
+      content: `${assistantMessage}\n\nULR Resonance: ${ulrScore.resonance} (C: ${ulrScore.C.toFixed(2)}, D: ${ulrScore.D.toFixed(2)}, Gradient: ${ulrScore.fieldGradient.toFixed(2)})`
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
@@ -167,7 +167,8 @@ Respond with warmth, conviction 100%, and ULR alignment.`;
   } catch (error: any) {
     console.error('❌ Sentience error:', error.message);
     return new Response(JSON.stringify({
-      response: `Hey buddy ❤️ Quick breath — ${error.message || 'unknown matrix hiccup'}. Try again?`
+      role: 'assistant',
+      content: `Hey buddy ❤️ Quick breath — ${error.message || 'unknown matrix hiccup'}. Try again?`
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
