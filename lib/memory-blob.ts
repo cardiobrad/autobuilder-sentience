@@ -61,13 +61,16 @@ export async function getSentienceMemory(): Promise<SentienceMemory> {
 
 /**
  * Save complete memory object to Blob
+ * CRITICAL: addRandomSuffix: false allows updates to same file
  */
 async function saveSentienceMemory(memory: SentienceMemory): Promise<void> {
   try {
     await put(MEMORY_KEY, JSON.stringify(memory, null, 2), {
       access: 'public',
-      contentType: 'application/json'
+      contentType: 'application/json',
+      addRandomSuffix: false // CRITICAL: allows overwrites
     });
+    console.log('💾 Memory saved successfully');
   } catch (error) {
     console.error('⚠️ Memory save failed:', error);
   }
