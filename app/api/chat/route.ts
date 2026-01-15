@@ -81,7 +81,7 @@ Be concise but thoughtful. When helping with code, explain the why, not just the
 
     // Changed stream: true to stream: false to get the full object
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-3-5-sonnet-latest',
       max_tokens: 4096,
       system: systemPrompt,
       messages,
