@@ -55,7 +55,8 @@ export async function updateSentienceMemory(updates: Partial<typeof defaults>) {
     console.log('💾 Saving memory update...');
     const { error } = await supabase
       .from('sentience_memory')
-      .upsert({ id: 1, ...updates }, { onConflict: 'id' });
+      .update(updates)
+      .eq('id', 1);
 
     if (error) console.error('Update error:', error.message);
     else console.log('✅ Memory saved');
