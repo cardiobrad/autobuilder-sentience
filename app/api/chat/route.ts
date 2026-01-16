@@ -71,7 +71,7 @@ Equation: dU/dt = D∇²U - v·∇U + β(∇U·∇U)U + λU²sin(αU) + Γ(U)
     });
 
     const claudeResponse = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20240620',
+      model: 'claude-3-5-sonnet-latest', // FIXED: Changed from 'claude-3-5-sonnet-20240620'
       max_tokens: 1024,
       system: systemPrompt,
       messages: messages.map((m: any) => ({
